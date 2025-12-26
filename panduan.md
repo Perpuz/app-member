@@ -1,9 +1,9 @@
 # Panduan Instalasi Project Perpustakaan Digital (User Portal)
 
-Berikut adalah langkah-langkah untuk menjalankan project ini dari awal (setelah clone dari repository).
+Berikut adalah langkah-langkah untuk menjalankan project.
 
 ## Prasyarat
-Pastikan komputer Anda sudah terinstall:
+Pastikan sudah terinstall:
 - **PHP** (Minimal versi 8.1)
 - **Composer**
 - **MySQL** / MariaDB
@@ -81,7 +81,7 @@ Untuk mengambil data buku terbaru dari Admin Portal:
 ```bash
 php artisan books:sync
 ```
-*(Pastikan `EXTERNAL_API_URL` sudah benar dan server teman sedang jalan)*
+*(Pastikan `EXTERNAL_API_URL` sudah benar dan server ci sedang jalan)*
 
 ### Endpoint Data User
 Admin Portal bisa mengambil data user dari kita melalui endpoint:
