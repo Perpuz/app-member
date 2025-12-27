@@ -14,6 +14,66 @@ class BookController extends Controller
      */
     public function index(Request $request)
     {
+        // Sync from App-Librarian
+        $externalUrl = env('EXTERNAL_API_URL'); 
+        $integrationSecret = env('INTEGRATION_SECRET');
+
+        if ($externalUrl && $integrationSecret) {
+            try {
+                $client = new \GuzzleHttp\Client();
+                // Ensure URL ends with /api/integration/books
+                $endpoint = rtrim($externalUrl, '/') . '/api/integration/books';
+                
+                $response = $client->request('GET', $endpoint, [
+                    'headers' => [
+                        'X-INTEGRATION-SECRET' => $integrationSecret,
+                        'Accept' => 'application/json'
+                    ],
+                    'timeout' => 5, 
+                    'verify' => false, 
+                    'http_errors' => false
+                ]);
+
+                if ($response->getStatusCode() == 200) {
+                    $books = json_decode($response->getBody(), true);
+                    $books = isset($books['data']) ? $books['data'] : $books;
+
+                    if (is_array($books)) {
+                        // Ensure a default category exists
+                        $defaultCategory = \App\Models\Category::firstOrCreate(
+                            ['name' => 'General'],
+                            ['description' => 'Imported Books']
+                        );
+                        
+                        foreach ($books as $extBook) {
+                            if (!isset($extBook['isbn']) || empty($extBook['isbn'])) {
+                                $extBook['isbn'] = 'GEN-' . ($extBook['id'] ?? uniqid());
+                            }
+                            
+                            Book::updateOrCreate(
+                                ['isbn' => $extBook['isbn']], 
+                                [
+                                    'title' => $extBook['title'],
+                                    'author' => $extBook['author'],
+                                    'publisher' => $extBook['publisher'] ?? 'Unknown',
+                                    'publication_year' => $extBook['publish_year'] ?? $extBook['published_year'] ?? $extBook['year'] ?? date('Y'),
+                                    'category_id' => $defaultCategory->id,
+                                    'description' => $extBook['description'] ?? '',
+                                    'total_copies' => $extBook['stock'] ?? 10,
+                                    'available_copies' => $extBook['stock'] ?? 10,
+                                    'cover_image' => $extBook['cover_url'] ?? null
+                                ]
+                            );
+                        }
+                    }
+                } else {
+                     \Illuminate\Support\Facades\Log::error('Book Sync Failed. Status: ' . $response->getStatusCode());
+                }
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Book Sync Exception: ' . $e->getMessage());
+            }
+        }
+
         $query = Book::with('category');
 
         if ($request->has('search')) {
