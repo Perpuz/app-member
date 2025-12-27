@@ -119,12 +119,19 @@
                 
                 grid.innerHTML += `
                     <div class="card" style="margin-bottom: 0; padding: 0; overflow: hidden; display: flex; flex-direction: column;">
-                        <div style="aspect-ratio: 2/3; background: #2d3748; position: relative;">
-                            <!-- Placeholder -->
-                            <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #64748b; font-size: 2rem;">
-                                <i class="fas fa-book"></i>
-                            </div>
-                            
+                        <div style="aspect-ratio: 2/3; background: #e5e7eb; position: relative;">
+                            ${
+                                book.cover_image
+                                ? `<img 
+                                    src="${book.cover_image}" 
+                                    alt="${book.title}" 
+                                    style="width:100%; height:100%; object-fit:cover;"
+                                >`
+                                : `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #64748b; font-size: 2rem;">
+                                        <i class="fas fa-book"></i>
+                                </div>`
+                            }
+
                             <!-- Badges -->
                             <div style="position: absolute; top: 0.5rem; right: 0.5rem;">
                                 ${available 
