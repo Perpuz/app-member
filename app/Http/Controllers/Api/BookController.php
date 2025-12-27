@@ -15,7 +15,7 @@ class BookController extends Controller
     public function index(Request $request)
     {
         // Sync from App-Librarian
-        $externalUrl = env('EXTERNAL_API_URL'); 
+        $externalUrl = env('EXTERNAL_API_URL'); // e.g., http://localhost:8081
         $integrationSecret = env('INTEGRATION_SECRET');
 
         if ($externalUrl && $integrationSecret) {
@@ -29,24 +29,22 @@ class BookController extends Controller
                         'X-INTEGRATION-SECRET' => $integrationSecret,
                         'Accept' => 'application/json'
                     ],
-                    'timeout' => 5, 
-                    'verify' => false, 
-                    'http_errors' => false
+                    'timeout' => 5, // Increased timeout
+                    'verify' => false, // Disable SSL verify for localhost
+                    'http_errors' => false // Catch 404/500 manually
                 ]);
 
                 if ($response->getStatusCode() == 200) {
                     $books = json_decode($response->getBody(), true);
+                    
+                    // Handle Wrapped vs Direct
                     $books = isset($books['data']) ? $books['data'] : $books;
 
                     if (is_array($books)) {
-                        // Ensure a default category exists
-                        $defaultCategory = \App\Models\Category::firstOrCreate(
-                            ['name' => 'General'],
-                            ['description' => 'Imported Books']
-                        );
-                        
+                        $countObj = 0;
                         foreach ($books as $extBook) {
                             if (!isset($extBook['isbn']) || empty($extBook['isbn'])) {
+                                // Fallback ISBN if missing or empty
                                 $extBook['isbn'] = 'GEN-' . ($extBook['id'] ?? uniqid());
                             }
                             
@@ -55,21 +53,23 @@ class BookController extends Controller
                                 [
                                     'title' => $extBook['title'],
                                     'author' => $extBook['author'],
-                                    'publisher' => $extBook['publisher'] ?? 'Unknown',
-                                    'publication_year' => $extBook['publish_year'] ?? $extBook['published_year'] ?? $extBook['year'] ?? date('Y'),
-                                    'category_id' => $defaultCategory->id,
-                                    'description' => $extBook['description'] ?? '',
-                                    'total_copies' => $extBook['stock'] ?? 10,
-                                    'available_copies' => $extBook['stock'] ?? 10,
+                                    'stock' => $extBook['stock'],
+                                    'category_id' => 1,
+                                    // Map publish_year to published_year
+                                    'published_year' => $extBook['publish_year'] ?? $extBook['published_year'] ?? date('Y'),
                                     'cover_image' => $extBook['cover_url'] ?? null
                                 ]
                             );
+                            $countObj++;
                         }
+                        // Log success
+                        // \Illuminate\Support\Facades\Log::info("Synced $countObj books from Librarian.");
                     }
                 } else {
                      \Illuminate\Support\Facades\Log::error('Book Sync Failed. Status: ' . $response->getStatusCode());
                 }
             } catch (\Exception $e) {
+                // Log full error
                 \Illuminate\Support\Facades\Log::error('Book Sync Exception: ' . $e->getMessage());
             }
         }
