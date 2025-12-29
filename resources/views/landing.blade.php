@@ -67,6 +67,37 @@
         </div>
     </main>
 
+    <!-- Browse Books Section -->
+    <section class="browse-section" id="browse-books">
+        <div class="browse-header">
+            <h2 class="browse-title">Browse Books</h2>
+            <p class="browse-subtitle">Discover our vast collection of knowledge</p>
+        </div>
+
+        <div class="filter-bar">
+            <select id="landing-category-filter" class="filter-select">
+                <option value="">All Categories</option>
+                <!-- JS Populated -->
+            </select>
+            
+            <div class="search-container">
+                <input type="text" id="landing-search-input" class="search-input-landing" placeholder="Search by title, author, or ISBN...">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+        </div>
+
+        <div id="landing-book-grid" class="landing-book-grid">
+            <!-- JS Populated -->
+            <div class="book-card-landing" style="height: 300px; grid-column: 1/-1; align-items: center; justify-content: center;">
+                <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--text-perpuz);"></i>
+            </div>
+        </div>
+
+        <div class="view-more-container">
+            <a href="{{ route('books.index') }}" id="view-more-books-btn" class="view-more-main-btn">View More</a>
+        </div>
+    </section>
+
     <!-- Login Modal -->
     <div class="modal-overlay" id="loginModal">
         <div class="modal-content">
@@ -117,7 +148,125 @@
                     openLoginModal();
                 });
             }
+
+            // View More Button Interceptor
+            const viewMoreBtn = document.getElementById('view-more-books-btn');
+            if (viewMoreBtn) {
+                viewMoreBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (localStorage.getItem('auth_token')) {
+                        window.location.href = this.href;
+                    } else {
+                        openLoginModal();
+                    }
+                });
+            }
+            
+            // Load Browse Section Data
+            loadLandingCategories();
+            loadLandingBooks();
+            
+            // Search Debounce
+            let timeout;
+            const searchInput = document.getElementById('landing-search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => {
+                        loadLandingBooks(e.target.value, document.getElementById('landing-category-filter').value);
+                    }, 500);
+                });
+            }
+            
+            // Category Filter
+            const catFilter = document.getElementById('landing-category-filter');
+            if (catFilter) {
+                catFilter.addEventListener('change', function(e) {
+                    loadLandingBooks(document.getElementById('landing-search-input').value, e.target.value);
+                });
+            }
         });
+
+        // Fetch Categories
+        async function loadLandingCategories() {
+            try {
+                const response = await fetch('/api/categories');
+                const data = await response.json();
+                const select = document.getElementById('landing-category-filter');
+                
+                if (data.success && select) {
+                    data.data.forEach(cat => {
+                        const option = document.createElement('option');
+                        option.value = cat.id;
+                        option.textContent = cat.name;
+                        select.appendChild(option);
+                    });
+                }
+            } catch(e) {
+                console.error('Error loading categories', e);
+            }
+        }
+
+        // Fetch Books
+        async function loadLandingBooks(search = '', category = '') {
+            const grid = document.getElementById('landing-book-grid');
+            if (!grid) return;
+            
+            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 3rem;"><i class="fas fa-spinner fa-spin fa-2x" style="color: var(--text-perpuz);"></i></div>';
+            
+            try {
+                let url = `/api/books?limit=8`; // Limit to 8 as per design (2 rows of 4)
+                if (search) url += `&search=${encodeURIComponent(search)}`;
+                if (category) url += `&category_id=${category}`;
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                const books = data.data.data;
+                
+                grid.innerHTML = '';
+                
+                if (books.length === 0) {
+                    grid.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-secondary);">
+                            <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                            <p>No books found matching your criteria.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                books.forEach(book => {
+                    grid.innerHTML += `
+                        <div class="book-card-landing">
+                            <div class="book-cover-landing">
+                                ${book.cover_image 
+                                    ? `<img src="${book.cover_image}" alt="${book.title}">` 
+                                    : `<div class="book-cover-placeholder"><i class="fas fa-book fa-3x" style="color: white; opacity:0.8;"></i></div>`
+                                }
+                            </div>
+                            <div class="book-info-landing">
+                                <h3 class="book-title-landing" title="${book.title}">${book.title}</h3>
+                                <p class="book-author-landing">${book.author}</p>
+                                <a href="/books/${book.id}" class="view-details-btn" onclick="handleBookDetailClick(event, this.href)">View Details</a>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+            } catch (error) {
+                console.error('Error loading books', error);
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--danger);">Failed to load books. Please try again later.</div>';
+            }
+        }
+
+        function handleBookDetailClick(e, url) {
+            e.preventDefault();
+            if (localStorage.getItem('auth_token')) {
+                window.location.href = url;
+            } else {
+                openLoginModal();
+            }
+        }
 
         // Mobile Menu Logic
         function toggleMobileMenu() {
