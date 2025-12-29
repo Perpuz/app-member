@@ -28,7 +28,7 @@
         <ul class="landing-nav-list">
             <li><a href="#home" class="landing-nav-link">Home</a></li>
             <li><a href="#browse-books" class="landing-nav-link">Books</a></li>
-            <li><a href="#" class="landing-nav-link">Contact</a></li>
+            <li><a href="#contact" class="landing-nav-link">Contact</a></li>
         </ul>
         <button class="hamburger-btn" onclick="toggleMobileMenu()" aria-label="Toggle Menu">
             <i class="fas fa-bars"></i>
@@ -44,7 +44,7 @@
         <ul class="mobile-nav-list">
             <li><a href="#home" class="landing-nav-link" onclick="closeMobileMenu()">Home</a></li>
             <li><a href="#browse-books" class="landing-nav-link" onclick="closeMobileMenu()">Books</a></li>
-            <li><a href="#" class="landing-nav-link" onclick="closeMobileMenu()">Contact</a></li>
+            <li><a href="#contact" class="landing-nav-link" onclick="closeMobileMenu()">Contact</a></li>
         </ul>
     </aside>
 
