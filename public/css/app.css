@@ -928,3 +928,140 @@ ul {
     box-shadow: 0 6px 15px rgba(111, 142, 72, 0.4);
     background-color: #5e7a3d;
 }
+
+/* Footer */
+.landing-footer {
+    background-color: var(--bg-new);
+    padding: 4rem 2rem 2rem;
+    border-top: 1px solid #f3f4f6;
+    margin-top: 4rem;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 3rem;
+    margin-bottom: 3rem;
+}
+
+.footer-brand .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-new);
+    margin-bottom: 1rem;
+}
+
+.footer-brand p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    max-width: 300px;
+}
+
+.footer-heading {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-new);
+    margin-bottom: 1.5rem;
+}
+
+.footer-links ul {
+    list-style: none;
+}
+
+.footer-links li {
+    margin-bottom: 0.75rem;
+}
+
+.footer-links a {
+    color: var(--text-secondary);
+    transition: color 0.2s;
+}
+
+.footer-links a:hover {
+    color: var(--text-perpuz);
+}
+
+.contact-info li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.contact-info i {
+    color: var(--text-perpuz);
+    width: 20px;
+}
+
+.newsletter-form {
+    margin-top: 1.5rem;
+}
+
+.newsletter-input-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.newsletter-input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: white;
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: var(--text-new);
+}
+
+.newsletter-input:focus {
+    outline: none;
+    border-color: var(--text-perpuz);
+}
+
+.newsletter-btn {
+    background: var(--text-perpuz);
+    color: white;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.newsletter-btn:hover {
+    background: #5e7a3d;
+}
+
+.footer-bottom {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-top: 2rem;
+    border-top: 1px solid #f3f4f6;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Footer Responsive */
+@media (max-width: 768px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+        text-align: center;
+    }
+
+    .footer-brand .logo,
+    .contact-info li {
+        justify-content: center;
+    }
+
+    .footer-brand p {
+        margin: 0 auto;
+    }
+}
