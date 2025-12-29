@@ -1,23 +1,25 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="grid grid-cols-1">
+<div class="dashboard-content">
+    <!-- Header -->
     <div style="margin-bottom: 2rem;">
-        <h1 style="font-size: 1.8rem; margin-bottom: 0.25rem;">My Transactions</h1>
-        <p style="color: var(--text-secondary);">Manage your borrowed books and view history</p>
+        <h1 class="page-title">My Transactions</h1>
+        <p class="page-subtitle">Manage your borrowed books and view history</p>
     </div>
     
     <!-- Filter Tabs -->
-    <div style="display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem;">
-        <button onclick="filterTransactions('all')" class="tab-btn active" id="tab-all" style="padding: 1rem; color: var(--text-secondary); background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-weight: 500;">All</button>
-        <button onclick="filterTransactions('borrowed')" class="tab-btn" id="tab-borrowed" style="padding: 1rem; color: var(--text-secondary); background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-weight: 500;">Active Loans</button>
-        <button onclick="filterTransactions('returned')" class="tab-btn" id="tab-returned" style="padding: 1rem; color: var(--text-secondary); background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-weight: 500;">Returned</button>
+    <div class="tab-container">
+        <button onclick="filterTransactions('all')" class="tab-btn active" id="tab-all">All</button>
+        <button onclick="filterTransactions('borrowed')" class="tab-btn" id="tab-borrowed">Active Loans</button>
+        <button onclick="filterTransactions('returned')" class="tab-btn" id="tab-returned">Returned</button>
     </div>
     
     <!-- Transactions List -->
-    <div id="transactions-list" class="grid grid-cols-1">
-        <div class="card" style="text-align: center; padding: 3rem;">
-            <i class="fas fa-spinner fa-spin fa-2x"></i>
+    <div id="transactions-list">
+        <div class="dashboard-card loading-card">
+            <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--text-perpuz);"></i>
+            <p>Loading transactions...</p>
         </div>
     </div>
 </div>
@@ -26,8 +28,8 @@
 @push('scripts')
 <style>
     .tab-btn.active {
-        color: var(--accent) !important;
-        border-bottom-color: var(--accent) !important;
+        color: var(--text-perpuz) !important;
+        border-bottom-color: var(--text-perpuz) !important;
     }
 </style>
 <script>
@@ -49,7 +51,7 @@
     
     async function loadTransactions() {
         const container = document.getElementById('transactions-list');
-        container.innerHTML = '<div class="card" style="text-align: center; padding: 3rem;"><i class="fas fa-spinner fa-spin fa-2x"></i></div>';
+        container.innerHTML = '<div class="dashboard-card loading-card"><i class="fas fa-spinner fa-spin fa-2x" style="color: var(--text-perpuz);"></i><p>Loading...</p></div>';
         
         try {
             let url = '/api/transactions';
@@ -64,11 +66,11 @@
             
             if (data.data.data.length === 0) {
                 container.innerHTML = `
-                    <div class="card" style="text-align: center; padding: 3rem;">
-                        <i class="fas fa-history" style="font-size: 3rem; color: var(--text-secondary); margin-bottom: 1rem; opacity: 0.5;"></i>
-                        <h3>No transactions found</h3>
-                        <p style="color: var(--text-secondary);">You haven't borrowed any books yet.</p>
-                        <a href="{{ route('books.index') }}" class="btn btn-primary" style="margin-top: 1rem;">Browse Books</a>
+                    <div class="dashboard-card empty-state">
+                        <i class="fas fa-history" style="font-size: 3rem; color: var(--text-perpuz); margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <h3 style="color: var(--text-new);">No transactions found</h3>
+                        <p style="color: #6b7280;">You haven't borrowed any books yet.</p>
+                        <a href="{{ route('books.index') }}" class="dashboard-btn-primary" style="margin-top: 1rem;">Browse Books</a>
                     </div>
                 `;
                 return;
@@ -89,7 +91,7 @@
                 };
                 
                 const returnButton = trx.status === 'borrowed' || trx.status === 'overdue' 
-                    ? `<button onclick="returnBook(${trx.id})" class="btn" style="background: var(--bg-primary); border: 1px solid var(--border-color); font-size: 0.9rem;">Return Book</button>`
+                    ? `<button onclick="returnBook(${trx.id})" class="return-btn">Return Book</button>`
                     : '';
                 
                 const borrowDate = new Date(trx.borrow_date).toLocaleDateString();
@@ -97,39 +99,39 @@
                 const returnDate = trx.return_date ? new Date(trx.return_date).toLocaleDateString() : '-';
                 
                 html += `
-                    <div class="card" style="padding: 1.5rem; display: flex; gap: 1.5rem; flex-wrap: wrap;">
-                        <div style="width: 80px; height: 100px; background: #334155; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #64748b; flex-shrink: 0;">
-                            <i class="fas fa-book fa-2x"></i>
+                    <div class="transaction-card">
+                        <div class="transaction-cover">
+                            <i class="fas fa-book"></i>
                         </div>
                         
-                        <div style="flex: 1; min-width: 250px;">
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                        <div class="transaction-info">
+                            <div class="transaction-header">
                                 <div>
-                                    <span class="badge" style="background: rgba(255,255,255,0.05); color: ${statusColors[trx.status]}; margin-bottom: 0.5rem; display: inline-block;">
+                                    <span class="badge" style="background: rgba(255,255,255,0.1); color: ${statusColors[trx.status]}; margin-bottom: 0.5rem; display: inline-block;">
                                         ${statusLabels[trx.status]}
                                     </span>
-                                    <h3 style="font-size: 1.2rem; font-weight: 600;">${trx.book.title}</h3>
+                                    <h3 class="transaction-title">${trx.book.title}</h3>
                                 </div>
                                 ${returnButton}
                             </div>
                             
-                            <div class="grid grid-cols-3" style="gap: 1rem; margin-top: 1rem; background: var(--bg-primary); padding: 1rem; border-radius: 8px;">
-                                <div>
-                                    <span style="color: var(--text-secondary); font-size: 0.8rem; display: block;">Borrowed Date</span>
-                                    <span style="font-weight: 600;">${borrowDate}</span>
+                            <div class="transaction-dates">
+                                <div class="transaction-date-item">
+                                    <span class="transaction-date-label">Borrowed Date</span>
+                                    <span class="transaction-date-value">${borrowDate}</span>
                                 </div>
-                                <div>
-                                    <span style="color: var(--text-secondary); font-size: 0.8rem; display: block;">Due Date</span>
-                                    <span style="font-weight: 600;">${dueDate}</span>
+                                <div class="transaction-date-item">
+                                    <span class="transaction-date-label">Due Date</span>
+                                    <span class="transaction-date-value">${dueDate}</span>
                                 </div>
-                                <div>
-                                    <span style="color: var(--text-secondary); font-size: 0.8rem; display: block;">Return Date</span>
-                                    <span style="font-weight: 600;">${returnDate}</span>
+                                <div class="transaction-date-item">
+                                    <span class="transaction-date-label">Return Date</span>
+                                    <span class="transaction-date-value">${returnDate}</span>
                                 </div>
                             </div>
                             
                             ${trx.fine_amount > 0 ? `
-                                <div style="margin-top: 1rem; color: var(--danger); font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                                <div class="transaction-fine">
                                     <i class="fas fa-exclamation-circle"></i>
                                     Fine: Rp ${trx.fine_amount}
                                 </div>
@@ -143,7 +145,7 @@
             
         } catch (error) {
             console.error(error);
-            container.innerHTML = '<div class="card text-center text-danger">Failed to load transactions.</div>';
+            container.innerHTML = '<div class="dashboard-card error-state">Failed to load transactions.</div>';
         }
     }
     

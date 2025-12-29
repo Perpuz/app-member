@@ -20,8 +20,11 @@
 </head>
 <body class="antialiased">
     <div id="app">
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        
         <!-- Sidebar -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="logo">
                     <i class="fas fa-book-reader"></i>
@@ -74,8 +77,10 @@
         <main class="main-content">
             <!-- Topbar -->
             <header class="topbar">
-                <div class="toggle-sidebar">
-                    <i class="fas fa-bars"></i>
+                <div class="topbar-left">
+                    <div class="toggle-sidebar">
+                        <i class="fas fa-bars"></i>
+                    </div>
                 </div>
                 
                 <div class="topbar-right">
@@ -174,6 +179,45 @@
                 return response;
             });
         };
+
+        // Sidebar Toggle Logic
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleBtn = document.querySelector('.toggle-sidebar');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            
+            console.log('Sidebar elements:', { toggleBtn, sidebar, sidebarOverlay });
+
+            if (toggleBtn && sidebar && sidebarOverlay) {
+                // Toggle sidebar
+                toggleBtn.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Prevent bubbling
+                    console.log('Sidebar toggle clicked');
+                    sidebar.classList.toggle('active');
+                    sidebarOverlay.classList.toggle('active');
+                });
+
+                // Close on overlay click
+                sidebarOverlay.addEventListener('click', function() {
+                    console.log('Overlay clicked');
+                    sidebar.classList.remove('active');
+                    sidebarOverlay.classList.remove('active');
+                });
+
+                // Close on nav link click (mobile)
+                const navLinks = sidebar.querySelectorAll('.sidebar-nav a');
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        if (window.innerWidth <= 768) {
+                            sidebar.classList.remove('active');
+                            sidebarOverlay.classList.remove('active');
+                        }
+                    });
+                });
+            } else {
+                console.error('Sidebar elements not found!');
+            }
+        });
     </script>
     @stack('scripts')
 </body>
