@@ -1,5 +1,4 @@
-# Panduan Instalasi Project Perpustakaan Digital (User Portal)
-
+# Panduan Instalasi Project Perpuz
 Berikut adalah langkah-langkah untuk menjalankan project.
 
 ## Prasyarat
@@ -11,27 +10,76 @@ Pastikan sudah terinstall:
 
 ## Langkah-langkah Instalasi
 
-### 1. Clone Repository (Jika belum)
+### Clone Repository app-librarian dan app-member(Jika belum)
 Jalankan perintah ini di terminal / command prompt:
 ```bash
-git clone <url-repository-anda>
-cd laravel-perpuz-user
+git clone <url-app-librarian>
+git clone <url-app-member>
+
 ```
 
-### 2. Install Library PHP (Composer)
-Download semua dependensi yang dibutuhkan laravel:
-```bash
+### Aktivasi CI APP-lIBRARIAN
+
+### 1.  **Install Dependensi**:
+masuk pada folder backend dengan 
+```
+cd app-librarian/backend
 composer install
 ```
 
-### 3. Konfigurasi Environment (.env)
+### 2.  **Install Dependensi**:
+Lalu salin file `env` menjadi `.env`, buka coment dan atur koneksi database Anda:
+```ini
+database.default.hostname = localhost
+database.default.database = perpuz_db
+database.default.username = root
+database.default.password = ''
+```
+tambahkan jwt dan integration secret di env app-librarian
+```
+JWT_SECRET=perpuz_librarian_secret_key_12345
+INTEGRATION_SECRET=rahasia-kita-bersama
+```
+Tambahkan URL App Member:
+```
+MEMBER_API_URL=http://localhost:8001
+```
+
+### 3.  **Setup Database**:
+```bash
+php spark migrate
+php spark db:seed UserSeeder
+```
+
+### 4. Menjalankan Server
+
+Gunakan perintah berikut untuk menjalankan server lokal:
+
+```bash
+php spark serve --port 8081
+```
+
+Akses aplikasi di browser: **[http://localhost:8081/index.html](http://localhost:8081/index.html)**
+
+---
+
+
+### Aktivasi Member APP-MEMBER
+
+1.  **Konfigurasi Environment**:
+Masuk pada folder APP-MEMBER, Lalu Instal Dependensi :
+```bash
+cd app-member
+composer install
+```
+
+### 2. Konfigurasi Environment (.env)
 Copy file konfigurasi contoh:
 ```bash
 cp .env.example .env
 ```
-*(Di Windows, Anda bisa copy-paste file `.env.example` manual dan rename menjadi `.env`)*
 
-Buka file `.env` dengan text editor, lalu sesuaikan konfigurasi database:
+Buka file `.env`, lalu sesuaikan konfigurasi database:
 ```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -42,30 +90,28 @@ DB_PASSWORD=
 ```
 *Pastikan Anda sudah membuat database kosong bernama `perpustakaan_mahasiswa` di MySQL/phpMyAdmin.*
 
-### 4. Generate Key Aplikasi
+### 3. Generate Key Aplikasi
 Jalankan perintah berikut untuk membuat key enkripsi Laravel dan JWT:
 ```bash
 php artisan key:generate
 php artisan jwt:secret
 ```
 
-### 5. Konfigurasi Integrasi (Opsional)
-Tambahkan konfigurasi berikut di file `.env` (bagian bawah) untuk keperluan integrasi dengan Admin Portal:
-```env
-# URL API Admin Portal
-EXTERNAL_API_URL=http://admin-perpuz.test/api
-
-# Secret Key untuk Admin mengakses data user kita
+### 4. **Setup Integrasi**:
+Ubah atau tambah .env sesuai environment berikut : 
+```
+EXTERNAL_API_URL=http://localhost:8081/api/integration
+EXTERNAL_API_TIMEOUT=30
 INTEGRATION_SECRET=rahasia-kita-bersama
 ```
 
-### 6. Migrasi Database & Data Dummy
+### 5. Migrasi Database & Data Dummy
 Jalankan perintah ini untuk membuat tabel dan mengisi data awal (buku & kategori):
 ```bash
 php artisan migrate --seed
 ```
 
-### 7. Jalankan Server
+### 6. Jalankan Server
 Jalankan server lokal Laravel:
 ```bash
 php artisan serve --port=8001
@@ -74,16 +120,11 @@ Akses di browser: **http://localhost:8001**
 
 ---
 
-## Fitur Integrasi
-
-### Sync Data Buku
-Untuk mengambil data buku terbaru dari Admin Portal:
+### 7. Sync Data Buku
+buka terminal baru, untuk mengambil data buku terbaru dari Admin Portal:
 ```bash
 php artisan books:sync
 ```
-*(Pastikan `EXTERNAL_API_URL` sudah benar dan server ci sedang jalan)*
+*(Pastikan spark server CI sedang jalan)*
 
-### Endpoint Data User
-Admin Portal bisa mengambil data user dari kita melalui endpoint:
-- **URL**: `GET /api/integration/users`
-- **Header**: `X-INTEGRATION-SECRET: rahasia-kita-bersama` (sesuai `.env`)
+
