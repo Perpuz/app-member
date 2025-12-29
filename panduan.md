@@ -112,7 +112,7 @@ php artisan migrate --seed
 ```
 
 ### 6. Jalankan Server
-Jalankan server lokal Laravel:
+Jalankan server lokal Laravel :
 ```bash
 php artisan serve --port=8001
 ```
