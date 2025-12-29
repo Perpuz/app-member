@@ -7,13 +7,31 @@
 
     <title>{{ config('app.name', 'Perpustakaan Digital') }}</title>
 
+    <!-- Resource Hints -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+
+    <!-- Critical Auth Check -->
+    <script>
+        (function() {
+            const token = localStorage.getItem('auth_token');
+            const publicRoutes = ['/login', '/register', '/'];
+            const currentPath = window.location.pathname;
+            if (!token && !publicRoutes.includes(currentPath)) {
+                window.location.replace('/');
+            }
+        })();
+    </script>
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
     
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
@@ -101,20 +119,17 @@
     </div>
 
     <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}"></script>
+    <script src="{{ asset('js/app.js') }}" defer></script>
     <script>
         // CLIENT-SIDE AUTH CHECK
         const token = localStorage.getItem('auth_token');
         const userStr = localStorage.getItem('user');
         
-        // Define public routes that don't need auth
+        // Define public routes (used relative to functionality)
         const publicRoutes = ['/login', '/register', '/'];
         const currentPath = window.location.pathname;
         
-        // redirect to login if no token and not on public route
-        if (!token && !publicRoutes.includes(currentPath)) {
-            window.location.href = '/';
-        }
+        // Note: Critical redirect is handled in <head>
         
         // Update UI based on auth state
         if (token && userStr) {
