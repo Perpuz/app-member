@@ -1,6 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
+<script>
+    // Client-side protection
+    if (!localStorage.getItem('auth_token')) {
+        window.location.href = '/';
+    }
+</script>
+
 <div class="grid grid-cols-1">
     <div class="card" style="background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);">
         <h1 style="font-size: 1.8rem; margin-bottom: 0.5rem;">Welcome back, <span id="welcome-name">Student</span>! 👋</h1>

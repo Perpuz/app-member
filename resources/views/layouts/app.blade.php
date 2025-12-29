@@ -108,7 +108,7 @@
         
         // redirect to login if no token and not on public route
         if (!token && !publicRoutes.includes(currentPath)) {
-            window.location.href = '/login';
+            window.location.href = '/';
         }
         
         // Update UI based on auth state
@@ -149,7 +149,7 @@
             
             localStorage.removeItem('auth_token');
             localStorage.removeItem('user');
-            window.location.href = '/login';
+            window.location.href = '/';
         });
 
         // Add Authorization header to all fetch requests
