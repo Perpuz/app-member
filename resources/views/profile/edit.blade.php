@@ -1,41 +1,41 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="grid grid-cols-1">
+<div class="dashboard-content">
+    <!-- Header -->
     <div style="margin-bottom: 2rem;">
-        <h1 style="font-size: 1.8rem; margin-bottom: 0.25rem;">My Profile</h1>
-        <p style="color: var(--text-secondary);">Manage your account information</p>
+        <h1 class="page-title">My Profile</h1>
+        <p class="page-subtitle">Manage your account information</p>
     </div>
 
-    <div class="grid grid-cols-3" style="gap: 2rem; align-items: start;">
+    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; align-items: start;">
         <!-- Profile Card -->
-        <div class="card" style="text-align: center;">
-            <div style="width: 100px; height: 100px; background: var(--bg-primary); border-radius: 50%; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: var(--accent); border: 2px solid var(--border-color);">
+        <div class="profile-card">
+            <div class="profile-avatar">
                 <i class="fas fa-user"></i>
             </div>
-            <h2 id="profile-name-display" style="margin-bottom: 0.25rem;">User Name</h2>
-            <p id="profile-role-display" style="color: var(--accent); font-size: 0.9rem; margin-bottom: 1.5rem;">Student Member</p>
+            <h2 id="profile-name-display" class="profile-name">User Name</h2>
+            <p id="profile-role-display" class="profile-role">Student Member</p>
             
-            <div style="text-align: left; background: var(--bg-primary); padding: 1rem; border-radius: 8px;">
-                <div style="margin-bottom: 0.75rem;">
-                    <span style="display: block; font-size: 0.8rem; color: var(--text-secondary);">NIM</span>
-                    <span id="profile-nim-display" style="font-weight: 600;">-</span>
+            <div class="profile-meta">
+                <div class="profile-meta-item">
+                    <span class="profile-meta-label">NIM</span>
+                    <span id="profile-nim-display" class="profile-meta-value">-</span>
                 </div>
-                <div>
-                    <span style="display: block; font-size: 0.8rem; color: var(--text-secondary);">Member Since</span>
-                    <span id="profile-joined-display" style="font-weight: 600;">-</span>
+                <div class="profile-meta-item">
+                    <span class="profile-meta-label">Member Since</span>
+                    <span id="profile-joined-display" class="profile-meta-value">-</span>
                 </div>
             </div>
         </div>
         
-        <!-- Edit Form -->
-        <div class="card" style="grid-column: span 2;">
-            <div id="success-alert" class="alert alert-success" style="display: none; background: rgba(16, 185, 129, 0.1); color: var(--success); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border: 1px solid var(--success);">
+        <!-- Edit Form --><div class="profile-form-card">
+            <div id="success-alert" class="success-alert" style="display: none;">
                 Profile updated successfully.
             </div>
             
             <form id="profile-form">
-                <div class="grid grid-cols-2" style="gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 1.5rem;">
                     <div class="form-group">
                         <label class="form-label" for="name">Full Name</label>
                         <input id="name" type="text" class="form-control" name="name" required>
@@ -47,7 +47,7 @@
                     </div>
                 </div>
                 
-                <div class="grid grid-cols-2" style="gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 1.5rem;">
                     <div class="form-group">
                         <label class="form-label" for="phone">Phone Number</label>
                         <input id="phone" type="text" class="form-control" name="phone">
@@ -59,11 +59,11 @@
                     </div>
                 </div>
                 
-                <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 2rem 0;">
+                <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 2rem 0;">
                 
-                <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Change Password <span style="font-size: 0.9rem; color: var(--text-secondary); font-weight: 400;">(Leave empty to keep current)</span></h3>
+                <h3 style="font-size: 1.1rem; margin-bottom: 1rem; color: var(--text-new);">Change Password <span style="font-size: 0.9rem; color: #6b7280; font-weight: 400;">(Leave empty to keep current)</span></h3>
                 
-                <div class="grid grid-cols-2" style="gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 1.5rem;">
                     <div class="form-group">
                         <label class="form-label" for="password">New Password</label>
                         <input id="password" type="password" class="form-control" name="password">
@@ -75,7 +75,7 @@
                     </div>
                 </div>
                 
-                <button type="submit" class="btn btn-primary" style="min-width: 150px;">
+                <button type="submit" class="dashboard-btn-primary" style="min-width: 150px;">
                     Save Changes
                 </button>
             </form>

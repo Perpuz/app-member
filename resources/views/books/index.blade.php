@@ -1,44 +1,45 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="grid grid-cols-1">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+<div class="dashboard-content">
+    <!-- Header -->
+    <div class="page-header">
         <div>
-            <h1 style="font-size: 1.8rem; margin-bottom: 0.25rem;">Browse Books</h1>
-            <p style="color: var(--text-secondary);">Discover our vast collection of knowledge</p>
+            <h1 class="page-title">Browse Books</h1>
+            <p class="page-subtitle">Discover our vast collection of knowledge</p>
         </div>
         
-        <div style="display: flex; gap: 1rem; flex: 1; max-width: 600px;">
-            <select id="category-filter" class="form-control" style="width: 180px;">
+        <div class="search-filter-bar">
+            <select id="category-filter" class="filter-select-small">
                 <option value="">All Categories</option>
                 <!-- populated by JS -->
             </select>
-            <div style="flex: 1; position: relative;">
-                <input type="text" id="search-input" class="form-control" placeholder="Search by title, author, or ISBN...">
-                <i class="fas fa-search" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary);"></i>
+            <div class="search-container-small">
+                <input type="text" id="search-input" class="search-input-small" placeholder="Search by title, author, or ISBN...">
+                <i class="fas fa-search search-icon-small"></i>
             </div>
         </div>
     </div>
     
     <!-- Books Grid -->
-    <div id="books-grid" class="grid grid-cols-4" style="gap: 1.5rem; margin-bottom: 2rem;">
+    <div id="books-grid" class="books-page-grid">
         <!-- Loading Skeleton -->
-        @for($i = 0; $i < 4; $i++)
-        <div class="card" style="height: 300px; display: flex; align-items: center; justify-content: center;">
-            <i class="fas fa-spinner fa-spin fa-2x"></i>
+        @for($i = 0; $i < 8; $i++)
+        <div class="books-page-card loading-state">
+            <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--text-perpuz);"></i>
         </div>
         @endfor
     </div>
     
     <!-- Empty State (Hidden) -->
-    <div id="empty-state" class="card" style="text-align: center; padding: 3rem; display: none;">
-        <i class="fas fa-search" style="font-size: 3rem; color: var(--text-secondary); margin-bottom: 1rem; opacity: 0.5;"></i>
-        <h3>No books found</h3>
-        <p style="color: var(--text-secondary);">Try adjusting your search or filters</p>
+    <div id="empty-state" class="dashboard-card empty-state" style="display: none;">
+        <i class="fas fa-search" style="font-size: 3rem; color: var(--text-perpuz); margin-bottom: 1rem; opacity: 0.5;"></i>
+        <h3 style="color: var(--text-new);">No books found</h3>
+        <p style="color: #6b7280;">Try adjusting your search or filters</p>
     </div>
     
     <!-- Pagination -->
-    <div id="pagination" style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 1rem;">
+    <div id="pagination" class="pagination-controls">
         <!-- Buttons injected by JS -->
     </div>
 </div>
@@ -93,7 +94,7 @@
         const emptyState = document.getElementById('empty-state');
         const pagination = document.getElementById('pagination');
         
-        grid.innerHTML = '<div class="card" style="grid-column: 1/-1; text-align: center; padding: 2rem;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+        grid.innerHTML = '<div class="dashboard-card loading-card" style="grid-column: 1/-1;"><i class="fas fa-spinner fa-spin fa-2x" style="color: var(--text-perpuz);"></i> <p>Loading books...</p></div>';
         emptyState.style.display = 'none';
         
         try {
@@ -118,8 +119,8 @@
                 const available = book.available_copies > 0;
                 
                 grid.innerHTML += `
-                    <div class="card" style="margin-bottom: 0; padding: 0; overflow: hidden; display: flex; flex-direction: column;">
-                        <div style="aspect-ratio: 2/3; background: #e5e7eb; position: relative;">
+                    <div class="books-page-card">
+                        <div class="book-page-cover">
                             ${
                                 book.cover_image
                                 ? `<img 
@@ -127,28 +128,26 @@
                                     alt="${book.title}" 
                                     style="width:100%; height:100%; object-fit:cover;"
                                 >`
-                                : `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #64748b; font-size: 2rem;">
-                                        <i class="fas fa-book"></i>
+                                : `<div class="book-cover-placeholder">
+                                        <i class="fas fa-book fa-3x"></i>
                                 </div>`
                             }
 
-                            <!-- Badges -->
-                            <div style="position: absolute; top: 0.5rem; right: 0.5rem;">
+                            <!-- Badge -->
+                            <div class="book-badge">
                                 ${available 
                                     ? '<span class="badge badge-success">Available</span>' 
                                     : '<span class="badge badge-danger">Out of Stock</span>'}
                             </div>
                         </div>
                         
-                        <div style="padding: 1rem; flex: 1; display: flex; flex-direction: column;">
-                            <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${book.title}</h3>
-                            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem;">${book.author}</p>
+                        <div class="book-page-info">
+                            <h3 class="book-page-title">${book.title}</h3>
+                            <p class="book-page-author">${book.author}</p>
                             
-                            <div style="margin-top: auto; padding-top: 1rem;">
-                                <a href="/books/${book.id}" class="btn btn-primary" style="width: 100%; font-size: 0.85rem; padding: 0.5rem;">
-                                    View Details
-                                </a>
-                            </div>
+                            <a href="/books/${book.id}" class="book-detail-btn">
+                                View Details
+                            </a>
                         </div>
                     </div>
                 `;
@@ -159,7 +158,7 @@
             
         } catch (error) {
             console.error(error);
-            grid.innerHTML = '<div class="card text-center text-danger" style="grid-column: 1/-1;">Failed to load books.</div>';
+            grid.innerHTML = '<div class="dashboard-card error-state" style="grid-column: 1/-1;">Failed to load books.</div>';
         }
     }
     
@@ -171,8 +170,7 @@
         
         // Prev
         const prevBtn = document.createElement('button');
-        prevBtn.className = 'btn';
-        prevBtn.style.background = 'var(--bg-secondary)';
+        prevBtn.className = 'pagination-btn';
         prevBtn.disabled = meta.current_page === 1;
         prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
         prevBtn.onclick = () => { currentPage--; loadBooks(); };
@@ -180,14 +178,13 @@
         
         // Page Info
         const info = document.createElement('span');
-        info.style.padding = '0.75rem';
+        info.className = 'pagination-info';
         info.innerHTML = `Page ${meta.current_page} of ${meta.last_page}`;
         pagination.appendChild(info);
         
         // Next
         const nextBtn = document.createElement('button');
-        nextBtn.className = 'btn';
-        nextBtn.style.background = 'var(--bg-secondary)';
+        nextBtn.className = 'pagination-btn';
         nextBtn.disabled = meta.current_page === meta.last_page;
         nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
         nextBtn.onclick = () => { currentPage++; loadBooks(); };
