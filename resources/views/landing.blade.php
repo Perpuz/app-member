@@ -109,15 +109,6 @@
                     Jelajahi ribuan buku dan sumber pengetahuan dengan mudah. Perpustakaan digital masa depan dalam genggaman Anda.
                 </p>
                 
-                <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Terima kasih telah berlangganan!');">
-                    <p style="margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 500;">Berlangganan Newsletter</p>
-                    <div class="newsletter-input-group">
-                        <input type="email" class="newsletter-input" placeholder="Email Anda..." required>
-                        <button type="submit" class="newsletter-btn">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
-                </form>
             </div>
 
             <div class="footer-links">
