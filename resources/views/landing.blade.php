@@ -26,8 +26,8 @@
             <i class="fas fa-book-reader"></i> Perpuz
         </div>
         <ul class="landing-nav-list">
-            <li><a href="#" class="landing-nav-link">Home</a></li>
-            <li><a href="#" class="landing-nav-link">Books</a></li>
+            <li><a href="#home" class="landing-nav-link">Home</a></li>
+            <li><a href="#browse-books" class="landing-nav-link">Books</a></li>
             <li><a href="#" class="landing-nav-link">Contact</a></li>
         </ul>
         <button class="hamburger-btn" onclick="toggleMobileMenu()" aria-label="Toggle Menu">
@@ -42,15 +42,15 @@
             <i class="fas fa-times"></i>
         </button>
         <ul class="mobile-nav-list">
-            <li><a href="#" class="landing-nav-link" onclick="closeMobileMenu()">Home</a></li>
-            <li><a href="#" class="landing-nav-link" onclick="closeMobileMenu()">Books</a></li>
+            <li><a href="#home" class="landing-nav-link" onclick="closeMobileMenu()">Home</a></li>
+            <li><a href="#browse-books" class="landing-nav-link" onclick="closeMobileMenu()">Books</a></li>
             <li><a href="#" class="landing-nav-link" onclick="closeMobileMenu()">Contact</a></li>
         </ul>
     </aside>
 
     <!-- Hero Section -->
     <main class="hero-section">
-        <div class="hero-content">
+        <div class="hero-content" id="home">
             <h1 class="hero-title">Di Setiap Buku, Ada Dunia Baru</h1>
             <p class="hero-subtitle">
                 Jelajahi pengetahuan dan kisah tak terbatas<br>
@@ -97,6 +97,61 @@
             <a href="{{ route('books.index') }}" id="view-more-books-btn" class="view-more-main-btn">View More</a>
         </div>
     </section>
+
+    <!-- Footer -->
+    <footer class="landing-footer" id="contact">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="logo">
+                     <i class="fas fa-book-reader" style="color: var(--danger);"></i> Perpuz
+                </div>
+                <p>
+                    Jelajahi ribuan buku dan sumber pengetahuan dengan mudah. Perpustakaan digital masa depan dalam genggaman Anda.
+                </p>
+                
+                <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Terima kasih telah berlangganan!');">
+                    <p style="margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 500;">Berlangganan Newsletter</p>
+                    <div class="newsletter-input-group">
+                        <input type="email" class="newsletter-input" placeholder="Email Anda..." required>
+                        <button type="submit" class="newsletter-btn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="footer-links">
+                <h4 class="footer-heading">Navigasi</h4>
+                <ul>
+                    <li><a href="#home">Beranda</a></li>
+                    <li><a href="#browse-books">Koleksi Buku</a></li>
+                    <li><a href="#" onclick="openLoginModal()">Login Member</a></li>
+                    <li><a href="#" onclick="openRegisterModal()">Daftar Sekarang</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-contact">
+                <h4 class="footer-heading">Hubungi Kami</h4>
+                <ul class="contact-info">
+                    <li>
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Jl. Mawar, Surabaya</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-phone"></i>
+                        <span>+62 812 3456 7890</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-envelope"></i>
+                        <span>info@perpuz.id</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2024 Perpuz Digital Library. Hak Cipta Dilindungi.
+        </div>
+    </footer>
 
     <!-- Login Modal -->
     <div class="modal-overlay" id="loginModal">
