@@ -28,7 +28,7 @@ class Transaction extends Model
     const STATUS_RETURNED = 'returned';
     const STATUS_OVERDUE = 'overdue';
     
-    const FINE_PER_DAY = 2000; // Rp 2000 per hari
+    const FINE_PER_DAY = 5000; // Rp 5000 per hari
     
     /**
      * Get the user that owns the transaction
@@ -77,13 +77,14 @@ class Transaction extends Model
     /**
      * Check if transaction is overdue
      */
-    public function  isOverdue()
+    public function isOverdue()
     {
         if ($this->status === self::STATUS_RETURNED) {
             return false;
         }
         
-        return Carbon::parse($this->due_date)->isPast();
+        // Due date is inclusive (until 23:59:59)
+        return Carbon::parse($this->due_date)->endOfDay()->isPast();
     }
     
     /**
@@ -96,7 +97,18 @@ class Transaction extends Model
         }
         
         $returnDate = $this->return_date ?? now();
-        $daysOverdue = Carbon::parse($this->due_date)->diffInDays($returnDate);
+        $dueDate = Carbon::parse($this->due_date)->endOfDay();
+        
+        // Use floatDiffInDays to capture fractional days, then ceil to round up
+        // If floatDiffInDays not available, standard diffInDays returning float works too
+        // We force float via simple subtraction logic or macro if needed,
+        // but Tinker confirmed diffInDays returns float here.
+        // We use ceil() to round UP (1 hour late = 1 day fine)
+        
+        // Calculate difference in days (start of next day counts as 1 day)
+        // We use diffInMinutes / 1440 to be safe and precise
+        $minutesOverdue = $dueDate->diffInMinutes($returnDate);
+        $daysOverdue = ceil($minutesOverdue / 1440);
         
         return $daysOverdue * self::FINE_PER_DAY;
     }
@@ -118,13 +130,13 @@ class Transaction extends Model
      */
     public function processReturn()
     {
-        $this->return_date = now();
-        $this->status = self::STATUS_RETURNED;
-        
-        // Calculate fine if overdue
+        // Calculate fine if overdue (Check BEFORE setting status to returned)
         if ($this->isOverdue()) {
             $this->fine_amount = $this->calculateFine();
         }
+
+        $this->return_date = now();
+        $this->status = self::STATUS_RETURNED;
         
         $this->save();
         

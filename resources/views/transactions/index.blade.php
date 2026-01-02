@@ -97,12 +97,45 @@
                 const borrowDate = new Date(trx.borrow_date).toLocaleDateString();
                 const dueDate = new Date(trx.due_date).toLocaleDateString();
                 const returnDate = trx.return_date ? new Date(trx.return_date).toLocaleDateString() : '-';
-                
+            
+                let coverHtml = `<div class="transaction-cover"><i class="fas fa-book"></i></div>`;
+                if (trx.book && trx.book.cover_image) {
+                     coverHtml = `<div class="transaction-cover" style="background-image: url('${trx.book.cover_image}'); background-size: cover; background-position: center;"></div>`;
+                }
+
+                let fineHtml = '';
+                if (parseFloat(trx.fine_amount) > 0) {
+                     fineHtml = `
+                        <div class="transaction-fine">
+                            <i class="fas fa-exclamation-circle"></i>
+                            Denda: Rp ${trx.fine_amount}
+                        </div>
+                    `;
+                } else {
+                    // Calculate Estimated Fine for Active Loans
+                    const today = new Date();
+                    const due = new Date(trx.due_date);
+                    // Reset hours to compare dates only
+                    today.setHours(0,0,0,0);
+                    due.setHours(0,0,0,0);
+                    
+                    if (trx.status !== 'returned' && today > due) {
+                        const diffTime = Math.abs(today - due);
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                        const estFine = diffDays * 5000;
+                        
+                        fineHtml = `
+                        <div class="transaction-fine estimated">
+                            <i class="fas fa-clock"></i>
+                            Est. Denda: Rp ${estFine}
+                        </div>
+                        `;
+                    }
+                }
+
                 html += `
                     <div class="transaction-card">
-                        <div class="transaction-cover">
-                            <i class="fas fa-book"></i>
-                        </div>
+                        ${coverHtml}
                         
                         <div class="transaction-info">
                             <div class="transaction-header">
@@ -110,7 +143,7 @@
                                     <span class="badge" style="background: rgba(255,255,255,0.1); color: ${statusColors[trx.status]}; margin-bottom: 0.5rem; display: inline-block;">
                                         ${statusLabels[trx.status]}
                                     </span>
-                                    <h3 class="transaction-title">${trx.book.title}</h3>
+                                    <h3 class="transaction-title">${trx.book ? trx.book.title : 'Unknown Book (Deleted)'}</h3>
                                 </div>
                                 ${returnButton}
                             </div>
@@ -130,12 +163,7 @@
                                 </div>
                             </div>
                             
-                            ${trx.fine_amount > 0 ? `
-                                <div class="transaction-fine">
-                                    <i class="fas fa-exclamation-circle"></i>
-                                    Fine: Rp ${trx.fine_amount}
-                                </div>
-                            ` : ''}
+                            ${fineHtml}
                         </div>
                     </div>
                 `;
@@ -144,8 +172,8 @@
             container.innerHTML = html;
             
         } catch (error) {
-            console.error(error);
-            container.innerHTML = '<div class="dashboard-card error-state">Failed to load transactions.</div>';
+            console.error('Transaction Load Error:', error);
+            container.innerHTML = `<div class="dashboard-card error-state">Failed to load transactions.<br><small style="color:red">${error.message}</small></div>`;
         }
     }
     

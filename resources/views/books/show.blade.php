@@ -90,8 +90,8 @@
             container.innerHTML = `
                 <div class="book-detail-layout">
                     <!-- Cover -->
-                    <div class="book-detail-cover">
-                        <i class="fas fa-book"></i>
+                    <div class="book-detail-cover" ${book.cover_image ? `style="background-image: url('${book.cover_image}'); background-size: cover; background-position: center;"` : ''}>
+                        ${book.cover_image ? '' : '<i class="fas fa-book"></i>'}
                     </div>
                     
                     <!-- Details -->

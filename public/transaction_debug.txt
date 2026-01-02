@@ -1,0 +1,56 @@
+2026-01-01 20:16:32 - Auth Failed, using User ID: 1
+2026-01-01 20:26:11 - Auth Failed, using User ID: 1
+2026-01-01 20:26:35 - Auth Failed, using User ID: 1
+2026-01-01 20:28:32 - Auth Failed, using User ID: 1
+2026-01-01 20:28:32 - Auth Failed, using User ID: 1
+2026-01-01 20:28:32 - Auth Failed, using User ID: 1
+2026-01-01 20:28:36 - Auth Failed, using User ID: 1
+2026-01-01 20:36:09 - Borrow Endpoint Hit
+2026-01-01 20:37:53 - Borrow Endpoint Hit. Data: {"book_id":"12","duration":"7"}
+2026-01-01 20:37:53 - Validation Passed
+2026-01-01 20:37:53 - Borrow Error (Throwable): Carbon\Carbon::rawAddUnit(): Argument #3 ($value) must be of type int|float, string given, called in C:\Users\ezkaz\OneDrive\Documents\Project\Perpuz\app-member\vendor\nesbot\carbon\src\Carbon\Traits\Units.php on line 356
+2026-01-01 20:37:59 - Borrow Endpoint Hit. Data: {"book_id":"12","duration":"3"}
+2026-01-01 20:37:59 - Validation Passed
+2026-01-01 20:37:59 - Borrow Error (Throwable): Carbon\Carbon::rawAddUnit(): Argument #3 ($value) must be of type int|float, string given, called in C:\Users\ezkaz\OneDrive\Documents\Project\Perpuz\app-member\vendor\nesbot\carbon\src\Carbon\Traits\Units.php on line 356
+2026-01-01 20:40:11 - Borrow Endpoint Hit. Data: {"book_id":"12","duration":"3"}
+2026-01-01 20:40:11 - Validation Passed
+2026-01-01 20:40:11 - Borrow Success
+2026-01-02 05:57:30 - Borrow Endpoint Hit. Data: {"book_id":"13","duration":"3"}
+2026-01-02 05:57:31 - Validation Passed
+2026-01-02 05:57:31 - Borrow Success
+2026-01-02 06:54:53 - Borrow Endpoint Hit. Data: {"book_id":"42","duration":"3"}
+2026-01-02 06:54:53 - Validation Passed
+2026-01-02 06:54:53 - Borrow Success
+2026-01-02 07:10:19 - Borrow Endpoint Hit. Data: {"book_id":"39","duration":"7"}
+2026-01-02 07:10:19 - Validation Passed
+2026-01-02 07:10:19 - Borrow Success
+2026-01-02 07:22:00 - Borrow Endpoint Hit. Data: {"book_id":"1","duration":"3"}
+2026-01-02 07:22:00 - Validation Passed
+2026-01-02 07:22:01 - Borrow Success
+2026-01-02 07:28:12 - Borrow Endpoint Hit. Data: {"book_id":"2","duration":"3"}
+2026-01-02 07:28:12 - Validation Passed
+2026-01-02 07:28:12 - Borrow Success
+2026-01-02 07:45:37 - Borrow Endpoint Hit. Data: {"book_id":"2","duration":"7"}
+2026-01-02 07:45:37 - Validation Passed
+2026-01-02 07:45:37 - Borrow Success
+2026-01-02 07:53:55 - Borrow Endpoint Hit. Data: {"book_id":"2","duration":"3"}
+2026-01-02 07:53:55 - Validation Passed
+2026-01-02 07:53:55 - Borrow Success
+2026-01-02 07:57:56 - Borrow Endpoint Hit. Data: {"book_id":"2","duration":"7"}
+2026-01-02 07:57:56 - Validation Passed
+2026-01-02 07:57:56 - Borrow Success
+2026-01-02 08:03:17 - Borrow Endpoint Hit. Data: {"book_id":"2","duration":"7"}
+2026-01-02 08:03:17 - Validation Passed
+2026-01-02 08:03:17 - Borrow Success
+2026-01-02 08:17:55 - Borrow Endpoint Hit. Data: {"book_id":"1","duration":"3"}
+2026-01-02 08:17:55 - Validation Passed
+2026-01-02 08:17:55 - Borrow Success
+2026-01-02 08:21:58 - Borrow Endpoint Hit. Data: {"book_id":"1","duration":"3"}
+2026-01-02 08:21:58 - Validation Passed
+2026-01-02 08:21:59 - Borrow Success
+2026-01-02 08:36:17 - Borrow Endpoint Hit. Data: {"book_id":"2","duration":"3"}
+2026-01-02 08:36:17 - Validation Passed
+2026-01-02 08:36:18 - Borrow Success
+2026-01-02 08:42:45 - Borrow Endpoint Hit. Data: {"book_id":"3","duration":"3"}
+2026-01-02 08:42:45 - Validation Passed
+2026-01-02 08:42:45 - Borrow Success

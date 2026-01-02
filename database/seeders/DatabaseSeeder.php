@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             CategorySeeder::class,
-            BookSeeder::class,
+            // BookSeeder::class, // Books synced from Librarian App
         ]);
     }
 }

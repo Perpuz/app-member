@@ -56,6 +56,9 @@ class AuthController extends Controller
             'address' => $request->address,
         ]);
 
+        // Sync to Librarian App
+        $this->syncToLibrarian($user);
+
         $token = auth('api')->login($user);
 
         return response()->json([
@@ -66,6 +69,36 @@ class AuthController extends Controller
                 'type' => 'bearer',
             ]
         ], 201);
+    }
+
+    private function syncToLibrarian($user)
+    {
+        try {
+            $url = env('EXTERNAL_API_URL');
+            $secret = env('INTEGRATION_SECRET');
+            
+            if ($url && $secret) {
+                $client = new \GuzzleHttp\Client();
+                $endpoint = rtrim($url, '/') . '/api/integration/sync/member';
+                
+                $client->post($endpoint, [
+                    'headers' => [
+                        'X-INTEGRATION-SECRET' => $secret,
+                        'Accept' => 'application/json'
+                    ],
+                    'json' => [
+                        'nim' => $user->nim,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'phone' => $user->phone
+                    ],
+                    'http_errors' => false,
+                    'timeout' => 2
+                ]);
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Member Sync Error: ' . $e->getMessage());
+        }
     }
 
     /**

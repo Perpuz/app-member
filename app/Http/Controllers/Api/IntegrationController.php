@@ -25,4 +25,37 @@ class IntegrationController extends Controller
             'data' => $users
         ]);
     }
+    /**
+     * Update user details from Admin Portal.
+     */
+    public function updateUser($nim, Request $request)
+    {
+        $user = User::where('nim', $nim)->first();
+
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'User not found'], 404);
+        }
+
+        // Validate basic fields
+        $validated = $request->validate([
+            'name' => 'nullable|string|max:255',
+            'email' => 'nullable|email|unique:users,email,' . $user->id,
+            'password' => 'nullable|string|min:6'
+        ]);
+
+        $updateData = [];
+        if (isset($validated['name'])) $updateData['name'] = $validated['name'];
+        if (isset($validated['email'])) $updateData['email'] = $validated['email'];
+        if (isset($validated['password'])) $updateData['password'] = bcrypt($validated['password']);
+
+        if (!empty($updateData)) {
+            $user->update($updateData);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User updated successfully',
+            'data' => $user
+        ]);
+    }
 }

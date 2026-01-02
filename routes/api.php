@@ -39,4 +39,6 @@ Route::group(['prefix' => 'member', 'middleware' => 'auth:api'], function () {
 // Integration Routes (Protected by Secret Key)
 Route::middleware([\App\Http\Middleware\CheckIntegrationSecret::class])->prefix('integration')->group(function () {
     Route::get('/users', [\App\Http\Controllers\Api\IntegrationController::class, 'getUsers']);
+    Route::put('/users/{nim}', [\App\Http\Controllers\Api\IntegrationController::class, 'updateUser']);
+    Route::post('/books', [\App\Http\Controllers\Api\BookController::class, 'storeFromIntegration']);
 });

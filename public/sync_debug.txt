@@ -1,0 +1,15 @@
+2026-01-02 07:08:35 - Attempting Sync to http://localhost:8081/api/integration/sync/member with payload {"nim":"33333333","name":"gatot cuy","email":"gatotyo@gmail.com","phone":null}
+ - Response Code: 200 Body: {
+    "status": "updated",
+    "id": "1"
+}
+2026-01-02 07:09:15 - Attempting Sync to http://localhost:8081/api/integration/sync/member with payload {"nim":"33333333","name":"gatot lancar","email":"gatotyo@gmail.com","phone":null}
+ - Response Code: 200 Body: {
+    "status": "updated",
+    "id": "1"
+}
+2026-01-02 07:09:49 - Attempting Sync to http://localhost:8081/api/integration/sync/member with payload {"nim":"33333333","name":"gatot salto","email":"gatotyo@gmail.com","phone":null}
+ - Response Code: 200 Body: {
+    "status": "updated",
+    "id": "1"
+}

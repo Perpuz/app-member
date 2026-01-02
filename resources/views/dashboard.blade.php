@@ -44,8 +44,8 @@
         <div class="dashboard-stat-card">
             <div class="stat-card-content">
                 <div class="stat-info">
-                    <h3 class="stat-label">Fines</h3>
-                    <div id="stat-fines" class="stat-value">-</div>
+                    <h3 class="stat-label">Denda</h3>
+                    <div id="totalFines" class="stat-value">-</div>
                 </div>
                 <div class="stat-icon stat-icon-danger">
                     <i class="fas fa-exclamation-circle"></i>
@@ -72,7 +72,7 @@
     <!-- New Books Section (Full Width) -->
     <div class="dashboard-section">
         <div class="section-header">
-            <h2 class="section-title">New Books</h2>
+            <h2 class="section-title">Recommendation</h2>
             <a href="{{ route('books.index') }}" class="section-link">Browse All</a>
         </div>
         
@@ -120,11 +120,14 @@
                 const isOverdue = new Date() > dueDate;
                 const daysLeft = Math.ceil((dueDate - new Date()) / (1000 * 60 * 60 * 24));
                 
+                let coverHtml = `<div class="loan-card-cover"><i class="fas fa-book"></i></div>`;
+                if (loan.book.cover_image) {
+                     coverHtml = `<div class="loan-card-cover" style="background-image: url('${loan.book.cover_image}'); background-size: cover; background-position: center;"></div>`;
+                }
+
                 html += `
                     <div class="dashboard-loan-card">
-                        <div class="loan-card-cover">
-                            <i class="fas fa-book"></i>
-                        </div>
+                        ${coverHtml}
                         <div class="loan-card-info">
                             <h4 class="loan-card-title">${loan.book.title}</h4>
                             <p class="loan-card-due">Due: ${new Date(loan.due_date).toLocaleDateString()}</p>
@@ -146,46 +149,93 @@
     
     async function loadNewBooks() {
         const container = document.getElementById('new-books-list');
+        // Override style to Grid (Vertical Wrapper)
+        container.style.display = 'grid';
+        container.style.gridTemplateColumns = 'repeat(auto-fill, minmax(140px, 1fr))';
+        container.style.gap = '1.5rem';
+        container.style.overflowX = 'visible';
+        
         try {
-            const response = await fetch('/api/books?limit=4');
+            // Update Limit to 10
+            const response = await fetch('/api/books?limit=10');
             const data = await response.json();
             
             let html = '';
-            data.data.data.slice(0, 4).forEach(book => {
+            // Display up to 10 books
+            const books = data.data.data.slice(0, 10);
+            
+            if (books.length === 0) {
+                 container.innerHTML = '<p>No books available.</p>';
+                 return;
+            }
+
+            books.forEach(book => {
+                // Use Cover Image if available
+                let coverHtml = `<div class="book-card-cover"><i class="fas fa-book"></i></div>`;
+                if (book.cover_image && book.cover_image.startsWith('http')) {
+                     coverHtml = `<div class="book-card-cover" style="background-image: url('${book.cover_image}'); background-size: cover; background-position: center;"></div>`;
+                }
+
                 html += `
-                    <a href="/books/${book.id}" class="dashboard-book-card">
-                        <div class="book-card-cover">
-                            <i class="fas fa-book"></i>
-                        </div>
-                        <h4 class="book-card-title">${book.title}</h4>
-                        <p class="book-card-author">${book.author}</p>
+                    <a href="/books/${book.id}" class="dashboard-book-card" style="text-decoration: none; color: inherit; display: flex; flex-direction: column;">
+                        ${coverHtml}
+                        <h4 class="book-card-title" style="margin-top: 0.5rem; font-size: 0.95rem; font-weight: 600; line-height: 1.3;">${book.title}</h4>
+                        <p class="book-card-author" style="font-size: 0.85rem; color: #666; margin-bottom: 0;">${book.author}</p>
                     </a>
                 `;
             });
             container.innerHTML = html;
         } catch (error) {
             console.log('Error loading books', error);
+            container.innerHTML = '<p>Failed to load books.</p>';
         }
     }
     
     async function loadStats() {
-        // Since we don't have a dedicated stats endpoint yet, we fetch lists
-        // In a real app we would add /api/member/stats
         try {
             // Get active loans count
-            const loansRes = await fetch('/api/transactions?status=borrowed');
+            const loansRes = await fetch('/api/transactions?status=borrowed&limit=100');
             const loansData = await loansRes.json();
             document.getElementById('stat-active').textContent = loansData.data.total || 0;
             
-            // Get all history count (approximate)
-            const allRes = await fetch('/api/transactions');
+            // Get all history count and Calculate Fines
+            const allRes = await fetch('/api/transactions?limit=100');
             const allData = await allRes.json();
             document.getElementById('stat-history').textContent = allData.data.total || 0;
             
-            // Fines (placeholder)
-            document.getElementById('stat-fines').textContent = 'Rp 0';
+            let totalFines = 0;
+            
+            // 1. Sum up finalized fines (returned books)
+            if (allData.data.data) {
+                allData.data.data.forEach(trx => {
+                    totalFines += parseFloat(trx.fine_amount || 0);
+                });
+            }
+
+            // 2. Sum up estimated fines (active overdue books)
+            if (loansData.data.data) {
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                
+                loansData.data.data.forEach(trx => {
+                    if (trx.status === 'borrowed' || trx.status === 'overdue') {
+                        const due = new Date(trx.due_date);
+                        due.setHours(0,0,0,0);
+                        
+                        // If Overdue and NOT returned (fine_amount likely 0)
+                        if (today > due && parseFloat(trx.fine_amount || 0) === 0) {
+                            const diffTime = Math.abs(today - due);
+                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                            totalFines += diffDays * 5000;
+                        }
+                    }
+                });
+            }
+            
+            document.getElementById('stat-fines').textContent = 'Rp ' + totalFines.toLocaleString('id-ID');
         } catch (e) {
             console.log(e);
+            document.getElementById('stat-fines').textContent = 'Rp -';
         }
     }
 </script>
