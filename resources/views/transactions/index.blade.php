@@ -11,7 +11,7 @@
     <!-- Filter Tabs -->
     <div class="tab-container">
         <button onclick="filterTransactions('all')" class="tab-btn active" id="tab-all">All</button>
-        <button onclick="filterTransactions('borrowed')" class="tab-btn" id="tab-borrowed">Active Loans</button>
+        <button onclick="filterTransactions('borrowed')" class="tab-btn" id="tab-borrowed">Peminjaman Aktif</button>
         <button onclick="filterTransactions('returned')" class="tab-btn" id="tab-returned">Returned</button>
     </div>
     
@@ -85,7 +85,7 @@
                 };
                 
                 const statusLabels = {
-                    'borrowed': 'Active Loan',
+                    'borrowed': 'Peminjaman Aktif',
                     'returned': 'Returned',
                     'overdue': 'Overdue'
                 };

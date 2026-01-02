@@ -18,7 +18,7 @@
 <div id="borrow-modal" class="modal-overlay">
     <div class="book-detail-modal">
         <h2 style="font-size: 1.25rem; font-weight: 600; color: var(--text-new); margin-bottom: 1rem;">Borrow Book</h2>
-        <p style="color: #6b7280; margin-bottom: 1.5rem;">Select loan duration (days):</p>
+        <p style="color: #6b7280; margin-bottom: 1.5rem;">Pilih durasi peminjaman (hari):</p>
         
         <form id="borrow-form">
             <input type="hidden" id="borrow-book-id">

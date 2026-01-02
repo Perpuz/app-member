@@ -20,7 +20,7 @@
         <div class="dashboard-stat-card">
             <div class="stat-card-content">
                 <div class="stat-info">
-                    <h3 class="stat-label">Active Loans</h3>
+                    <h3 class="stat-label">Peminjaman Aktif</h3>
                     <div id="stat-active" class="stat-value">-</div>
                 </div>
                 <div class="stat-icon stat-icon-primary">
@@ -57,14 +57,14 @@
     <!-- Active Loans Section (Full Width) -->
     <div class="dashboard-section">
         <div class="section-header">
-            <h2 class="section-title">Active Loans</h2>
+            <h2 class="section-title">Peminjaman Aktif</h2>
             <a href="{{ route('transactions.index') }}" class="section-link">View All</a>
         </div>
         
         <div id="active-loans-list">
             <div class="dashboard-card loading-card">
                 <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--text-perpuz); margin-bottom: 1rem;"></i>
-                <p>Loading active loans...</p>
+                <p>Loading peminjaman aktif...</p>
             </div>
         </div>
     </div>
@@ -107,8 +107,8 @@
                 container.innerHTML = `
                     <div class="dashboard-card empty-state">
                         <i class="fas fa-book-open" style="font-size: 2.5rem; color: var(--text-perpuz); margin-bottom: 1rem; opacity: 0.5;"></i>
-                        <p style="color: var(--text-new); margin-bottom: 1rem;">You don't have any active loans.</p>
-                        <a href="{{ route('books.index') }}" class="dashboard-btn-primary">Borrow a Book</a>
+                        <p style="color: var(--text-new); margin-bottom: 1rem;">Kamu belum memiliki peminjaman aktif.</p>>
+                        <a href="{{ route('books.index') }}" class="dashboard-btn-primary">Pinjam Buku</a>
                     </div>
                 `;
                 return;
@@ -143,7 +143,7 @@
             
         } catch (error) {
             console.error('Error loading loans', error);
-            container.innerHTML = '<div class="dashboard-card error-state">Failed to load active loans.</div>';
+            container.innerHTML = '<div class="dashboard-card error-state">Failed to load active peminjaman.</div>';
         }
     }
     
