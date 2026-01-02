@@ -462,3 +462,71 @@
  - Success: Synced 10 books
 2026-01-02 10:49:13 - Attempting Sync from: http://localhost:8081/api/integration/books
  - Success: Synced 10 books
+2026-01-02 10:53:13 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 10 books
+2026-01-02 10:53:18 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 10 books
+2026-01-02 11:01:27 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 10 books
+2026-01-02 11:01:29 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 10 books
+2026-01-02 11:01:37 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 10 books
+2026-01-02 11:01:38 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 10 books
+2026-01-02 11:04:11 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 10 books
+2026-01-02 11:04:14 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 10 books
+2026-01-02 11:04:17 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 10 books
+2026-01-02 11:10:55 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 10 books
+2026-01-02 11:10:58 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 10 books
+2026-01-02 11:11:14 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 10 books
+2026-01-02 11:11:18 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 10 books
+2026-01-02 11:11:23 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 10 books
+2026-01-02 11:11:24 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 10 books
+2026-01-02 11:11:44 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 10 books
+2026-01-02 11:11:51 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 10 books
+2026-01-02 11:16:47 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 10 books
+2026-01-02 11:20:16 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 10 books
+2026-01-02 11:20:33 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 10 books
+2026-01-02 11:20:35 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 10 books
+2026-01-02 11:21:04 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 11 books
+2026-01-02 11:21:08 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 11 books
+2026-01-02 11:23:17 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 11 books
+2026-01-02 11:23:29 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 11 books
+2026-01-02 11:24:02 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 12 books
+2026-01-02 11:24:03 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 12 books
+2026-01-02 11:24:07 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 12 books
+2026-01-06 11:24:51 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 12 books
+2026-01-06 11:24:56 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 12 books
+2026-01-06 11:25:29 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 12 books
+2026-01-02 11:26:39 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 12 books
+2026-01-02 11:26:42 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 12 books
+2026-01-02 11:26:50 - Attempting Sync from: http://localhost:8081/api/integration/books
+ - Success: Synced 12 books

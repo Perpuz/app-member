@@ -54,3 +54,9 @@
 2026-01-02 08:42:45 - Borrow Endpoint Hit. Data: {"book_id":"3","duration":"3"}
 2026-01-02 08:42:45 - Validation Passed
 2026-01-02 08:42:45 - Borrow Success
+2026-01-02 11:21:19 - Borrow Endpoint Hit. Data: {"book_id":"11","duration":"3"}
+2026-01-02 11:21:19 - Validation Passed
+2026-01-02 11:21:19 - Borrow Success
+2026-01-02 11:24:15 - Borrow Endpoint Hit. Data: {"book_id":"12","duration":"3"}
+2026-01-02 11:24:15 - Validation Passed
+2026-01-02 11:24:16 - Borrow Success
