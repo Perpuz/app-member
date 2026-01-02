@@ -60,24 +60,30 @@ class BookController extends Controller
                                 $extBook['isbn'] = 'GEN-' . ($extBook['id'] ?? uniqid());
                             }
                             
+                            // Fix: Interpret stock from App-Librarian as AVAILABLE copies, not Total.
+                            // We calculate Total by adding our locally active loans to the remote available stock.
+                            
+                            $remoteAvailable = $extBook['stock'] ?? 0;
+                            
+                            // Check for existing book to count active loans
+                            $localBook = Book::where('isbn', $extBook['isbn'])->first();
+                            $activeLoans = $localBook ? $localBook->transactions()->where('status', 'borrowed')->count() : 0;
+                            
+                            $impliedTotal = $remoteAvailable + $activeLoans;
+                            
                             $book = Book::updateOrCreate(
                                 ['isbn' => $extBook['isbn']], 
                                 [
                                     'title' => $extBook['title'],
                                     'author' => $extBook['author'],
-                                    'total_copies' => $extBook['stock'] ?? 0,
+                                    'total_copies' => $impliedTotal, // Use calculated total
+                                    'available_copies' => $remoteAvailable, // Use remote stock as available
                                     'category_id' => 1,
                                     'publisher' => $extBook['publisher'] ?? 'Unknown',
                                     'publication_year' => $extBook['publish_year'] ?? $extBook['published_year'] ?? date('Y'),
                                     'cover_image' => $extBook['cover_url'] ?? null
                                 ]
                             );
-                            
-                            // Recalculate Available Copies (Total - Active Loans)
-                            // Note: active() scope exists on Transaction, effectively checking status='borrowed'
-                            $activeLoans = $book->transactions()->where('status', 'borrowed')->count();
-                            $book->available_copies = max(0, $book->total_copies - $activeLoans);
-                            $book->save();
                             $countObj++;
                         }
                         // Log success
@@ -227,23 +233,27 @@ class BookController extends Controller
             $data['isbn'] = 'GEN-' . uniqid();
         }
 
+        // Fix: Stock from integration is AVAILABLE stock
+        $remoteAvailable = $data['stock'];
+        
+        $localBook = Book::where('isbn', $data['isbn'])->first();
+        $activeLoans = $localBook ? $localBook->transactions()->where('status', 'borrowed')->count() : 0;
+        
+        $impliedTotal = $remoteAvailable + $activeLoans;
+
         $book = Book::updateOrCreate(
             ['isbn' => $data['isbn']], 
             [
                 'title' => $data['title'],
                 'author' => $data['author'],
-                'total_copies' => $data['stock'],
+                'total_copies' => $impliedTotal,
+                'available_copies' => $remoteAvailable,
                 'category_id' => 1,
                 'publisher' => $data['publisher'] ?? 'Unknown',
                 'publication_year' => $data['publication_year'] ?? date('Y'),
                 'cover_image' => $data['cover_url'] ?? null
             ]
         );
-        
-        // Recalc available
-        $activeLoans = $book->transactions()->where('status', 'borrowed')->count();
-        $book->available_copies = max(0, $book->total_copies - $activeLoans);
-        $book->save();
 
         return response()->json(['success' => true, 'data' => $book]);
     }
