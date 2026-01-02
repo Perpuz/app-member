@@ -1,89 +1,109 @@
-# Panduan Instalasi Project Perpustakaan Digital (User Portal)
+# Dokumentasi Instalasi & Pengembangan Project Perpustakaan
 
-Berikut adalah langkah-langkah untuk menjalankan project.
+Repository ini berisi sistem perpustakaan digital yang terdiri dari dua aplikasi:
 
-## Prasyarat
-Pastikan sudah terinstall:
-- **PHP** (Minimal versi 8.1)
-- **Composer**
-- **MySQL** / MariaDB
-- **Git**
-
-## Langkah-langkah Instalasi
-
-### 1. Clone Repository (Jika belum)
-Jalankan perintah ini di terminal / command prompt:
-```bash
-git clone <url-repository-anda>
-cd laravel-perpuz-user
-```
-
-### 2. Install Library PHP (Composer)
-Download semua dependensi yang dibutuhkan laravel:
-```bash
-composer install
-```
-
-### 3. Konfigurasi Environment (.env)
-Copy file konfigurasi contoh:
-```bash
-cp .env.example .env
-```
-*(Di Windows, Anda bisa copy-paste file `.env.example` manual dan rename menjadi `.env`)*
-
-Buka file `.env` dengan text editor, lalu sesuaikan konfigurasi database:
-```env
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=perpustakaan_mahasiswa
-DB_USERNAME=root
-DB_PASSWORD=
-```
-*Pastikan Anda sudah membuat database kosong bernama `perpustakaan_mahasiswa` di MySQL/phpMyAdmin.*
-
-### 4. Generate Key Aplikasi
-Jalankan perintah berikut untuk membuat key enkripsi Laravel dan JWT:
-```bash
-php artisan key:generate
-php artisan jwt:secret
-```
-
-### 5. Konfigurasi Integrasi (Opsional)
-Tambahkan konfigurasi berikut di file `.env` (bagian bawah) untuk keperluan integrasi dengan Admin Portal:
-```env
-# URL API Admin Portal
-EXTERNAL_API_URL=http://admin-perpuz.test/api
-
-# Secret Key untuk Admin mengakses data user kita
-INTEGRATION_SECRET=rahasia-kita-bersama
-```
-
-### 6. Migrasi Database & Data Dummy
-Jalankan perintah ini untuk membuat tabel dan mengisi data awal (buku & kategori):
-```bash
-php artisan migrate --seed
-```
-
-### 7. Jalankan Server
-Jalankan server lokal Laravel:
-```bash
-php artisan serve --port=8001
-```
-Akses di browser: **http://localhost:8001**
+1.  **`app-librarian`**: Backend API Pustakawan (CodeIgniter 4).
+2.  **`app-member`**: Aplikasi Portal Mahasiswa (Laravel 10 + GraphQL Hybrid).
 
 ---
 
-## Fitur Integrasi
+## Prasyarat
+-   **PHP** (Minimal versi 8.1)
+-   **Composer**
+-   **MySQL** / MariaDB
 
-### Sync Data Buku
-Untuk mengambil data buku terbaru dari Admin Portal:
+---
+
+## 1. Setup Database
+Buat **dua** database kosong di MySQL:
+1.  `perpustakaan_admin` (Untuk aplikasi Librarian)
+2.  `perpustakaan_mahasiswa` (Untuk aplikasi Member)
+
+---
+
+## 2. Instalasi & Run Aplikasi Librarian (Port: 8081)
+Aplikasi ini berjalan sebagai Backend API.
+
+1.  **Masuk ke direktori:**
+    ```bash
+    cd app-librarian/backend
+    ```
+2.  **Install Dependencies:**
+    ```bash
+    composer install
+    ```
+3.  **Konfigurasi Environment:**
+    -   Copy file `env` menjadi `.env`
+    -   Edit `.env` (sesuaikan user/password database Anda):
+    ```env
+    database.default.hostname = localhost
+    database.default.database = perpustakaan_admin
+    database.default.username = root
+    database.default.password = 
+    database.default.DBDriver = MySQLi
+    ```
+4.  **Migrasi Database:**
+    ```bash
+    php spark migrate
+    ```
+5.  **Jalankan Server (Port 8081):**
+    ```bash
+    php spark serve --port=8081
+    ```
+    > **Penting:** API Admin harus jalan di port **8081** agar bisa diakses oleh aplikasi member.
+
+    *(Catatan: Folder `frontend` di dalam `app-librarian` saat ini belum digunakan secara aktif dalam alur ini)*
+
+---
+
+## 3. Instalasi & Run Aplikasi Member (Port: 8000)
+Aplikasi Portal Mahasiswa.
+
+1.  **Masuk ke direktori:**
+    ```bash
+    cd app-member
+    ```
+2.  **Install Dependencies:**
+    ```bash
+    composer install
+    ```
+3.  **Konfigurasi Environment:**
+    -   Copy `.env.example` ke `.env`
+    -   Edit `.env`:
+    ```env
+    DB_DATABASE=perpustakaan_mahasiswa
+    DB_USERNAME=root
+    DB_PASSWORD=
+
+    # URL API Admin (Arahkan ke Port 8081)
+    EXTERNAL_API_URL=http://localhost:8081/api
+    ```
+4.  **Generate Key:**
+    ```bash
+    php artisan key:generate
+    php artisan jwt:secret
+    ```
+5.  **Migrasi Database:**
+    ```bash
+    php artisan migrate --seed
+    ```
+6.  **Jalankan Server:**
+    ```bash
+    php artisan serve
+    ```
+    > Default berjalan di **http://localhost:8000**
+
+---
+
+## 4. Fitur & Penggunaan
+
+### Sinkronisasi Data
+Setelah kedua server berjalan (Admin :8081, Member :8000), jalankan perintah ini di terminal `app-member` untuk mengambil data buku dari Admin:
 ```bash
 php artisan books:sync
 ```
-*(Pastikan `EXTERNAL_API_URL` sudah benar dan server ci sedang jalan)*
 
-### Endpoint Data User
-Admin Portal bisa mengambil data user dari kita melalui endpoint:
-- **URL**: `GET /api/integration/users`
-- **Header**: `X-INTEGRATION-SECRET: rahasia-kita-bersama` (sesuai `.env`)
+### Akses GraphQL (Member App)
+Fitur Dashboard, Profil, dan Peminjaman menggunakan GraphQL.
+-   **Dashboard**: Login sebagai member, lihat di `http://localhost:8000/dashboard`
+-   **Playground**: Coba query manual di `http://localhost:8000/graphiql`
