@@ -86,67 +86,141 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', async function() {
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        if (user.name) {
-            document.getElementById('welcome-name').textContent = user.name.split(' ')[0];
-        }
-        
-        // Fetch Dashboard Data
-        loadActiveLoans();
-        loadNewBooks();
-        loadStats(); // We'll implement a simple calculation from transaction list
+        // Fetch Dashboard Data via GraphQL
+        fetchDashboardData();
+        loadNewBooks(); // Keep using REST for public books or change to GraphQL if desired (keeping REST for hybrid demo)
     });
     
-    async function loadActiveLoans() {
+    async function fetchDashboardData() {
         const container = document.getElementById('active-loans-list');
+        
         try {
-            const response = await fetch('/api/transactions?status=borrowed');
-            const data = await response.json();
+            const query = `
+                query {
+                    me {
+                        name
+                        transactions {
+                            id
+                            status
+                            due_date
+                            borrow_date
+                            return_date
+                            fine_amount
+                            book {
+                                title
+                                cover_image
+                            }
+                        }
+                    }
+                }
+            `;
+
+            const response = await fetch('/api/graphql', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('auth_token')
+                },
+                body: JSON.stringify({ query })
+            });
             
-            if (data.data.data.length === 0) {
-                container.innerHTML = `
-                    <div class="dashboard-card empty-state">
-                        <i class="fas fa-book-open" style="font-size: 2.5rem; color: var(--text-perpuz); margin-bottom: 1rem; opacity: 0.5;"></i>
-                        <p style="color: var(--text-new); margin-bottom: 1rem;">Kamu belum memiliki peminjaman aktif.</p>>
-                        <a href="{{ route('books.index') }}" class="dashboard-btn-primary">Pinjam Buku</a>
-                    </div>
-                `;
+            const result = await response.json();
+            
+            if (result.errors) {
+                console.error('GraphQL Errors:', result.errors);
                 return;
             }
             
-            let html = '';
-            data.data.data.forEach(loan => {
-                const dueDate = new Date(loan.due_date);
-                const isOverdue = new Date() > dueDate;
-                const daysLeft = Math.ceil((dueDate - new Date()) / (1000 * 60 * 60 * 24));
+            const user = result.data.me;
+            
+            // 1. Update User Name
+            if (user && user.name) {
+                document.getElementById('welcome-name').textContent = user.name.split(' ')[0];
+                // Also update local storage user if needed
+                localStorage.setItem('user', JSON.stringify({ name: user.name }));
+            }
+            
+            // Process Transactions
+            const transactions = user.transactions || [];
+            
+            // 2. Calculate Stats
+            const activeLoans = transactions.filter(t => t.status === 'borrowed' || t.status === 'overdue');
+            const totalHistory = transactions.length;
+            
+            document.getElementById('stat-active').textContent = activeLoans.length;
+            document.getElementById('stat-history').textContent = totalHistory;
+            
+            // Calculate Fines
+            let totalFines = 0;
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            
+            transactions.forEach(trx => {
+                // Actual fines
+                totalFines += parseFloat(trx.fine_amount || 0);
                 
-                let coverHtml = `<div class="loan-card-cover"><i class="fas fa-book"></i></div>`;
-                if (loan.book.cover_image) {
-                     coverHtml = `<div class="loan-card-cover" style="background-image: url('${loan.book.cover_image}'); background-size: cover; background-position: center;"></div>`;
+                // Estimated fines for active overdue
+                if ((trx.status === 'borrowed' || trx.status === 'overdue') && parseFloat(trx.fine_amount || 0) === 0) {
+                    const due = new Date(trx.due_date);
+                    due.setHours(0,0,0,0);
+                    if (today > due) {
+                        const diffTime = Math.abs(today - due);
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                        totalFines += diffDays * 5000;
+                    }
                 }
+            });
+            
+            document.getElementById('totalFines').textContent = 'Rp ' + totalFines.toLocaleString('id-ID'); // Fixed ID mismatch (was stat-fines)
 
-                html += `
-                    <div class="dashboard-loan-card">
-                        ${coverHtml}
-                        <div class="loan-card-info">
-                            <h4 class="loan-card-title">${loan.book.title}</h4>
-                            <p class="loan-card-due">Due: ${new Date(loan.due_date).toLocaleDateString()}</p>
-                            ${isOverdue 
-                                ? `<span class="badge badge-danger">Overdue ${Math.abs(daysLeft)} days</span>` 
-                                : `<span class="badge badge-success">${daysLeft} days left</span>`
-                            }
-                        </div>
+            // 3. Render Active Loans List
+            if (activeLoans.length === 0) {
+                container.innerHTML = `
+                    <div class="dashboard-card empty-state">
+                        <i class="fas fa-book-open" style="font-size: 2.5rem; color: var(--text-perpuz); margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <p style="color: var(--text-new); margin-bottom: 1rem;">Kamu belum memiliki peminjaman aktif.</p>
+                        <a href="{{ route('books.index') }}" class="dashboard-btn-primary">Pinjam Buku</a>
                     </div>
                 `;
-            });
-            container.innerHTML = html;
+            } else {
+                let html = '';
+                // Sort by due date ascending
+                activeLoans.sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
+                
+                activeLoans.forEach(loan => {
+                    const dueDate = new Date(loan.due_date);
+                    const isOverdue = new Date() > dueDate;
+                    const daysLeft = Math.ceil((dueDate - new Date()) / (1000 * 60 * 60 * 24));
+                    
+                    let coverHtml = `<div class="loan-card-cover"><i class="fas fa-book"></i></div>`;
+                    if (loan.book && loan.book.cover_image) {
+                         coverHtml = `<div class="loan-card-cover" style="background-image: url('${loan.book.cover_image}'); background-size: cover; background-position: center;"></div>`;
+                    }
+    
+                    html += `
+                        <div class="dashboard-loan-card">
+                            ${coverHtml}
+                            <div class="loan-card-info">
+                                <h4 class="loan-card-title">${loan.book ? loan.book.title : 'Deleted Book'}</h4>
+                                <p class="loan-card-due">Due: ${new Date(loan.due_date).toLocaleDateString()}</p>
+                                ${isOverdue 
+                                    ? `<span class="badge badge-danger">Overdue ${Math.abs(daysLeft)} days</span>` 
+                                    : `<span class="badge badge-success">${daysLeft} days left</span>`
+                                }
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
             
         } catch (error) {
-            console.error('Error loading loans', error);
-            container.innerHTML = '<div class="dashboard-card error-state">Failed to load active peminjaman.</div>';
+            console.error('Error fetching dashboard data:', error);
+            container.innerHTML = '<div class="dashboard-card error-state">Failed to load data via GraphQL.</div>';
         }
     }
     
+    // Legacy REST function for New Books (Hybrid Demo)
     async function loadNewBooks() {
         const container = document.getElementById('new-books-list');
         // Override style to Grid (Vertical Wrapper)
@@ -156,7 +230,6 @@
         container.style.overflowX = 'visible';
         
         try {
-            // Update Limit to 10
             const response = await fetch('/api/books?limit=10');
             const data = await response.json();
             
@@ -170,7 +243,6 @@
             }
 
             books.forEach(book => {
-                // Use Cover Image if available
                 let coverHtml = `<div class="book-card-cover"><i class="fas fa-book"></i></div>`;
                 if (book.cover_image && book.cover_image.startsWith('http')) {
                      coverHtml = `<div class="book-card-cover" style="background-image: url('${book.cover_image}'); background-size: cover; background-position: center;"></div>`;
@@ -188,54 +260,6 @@
         } catch (error) {
             console.log('Error loading books', error);
             container.innerHTML = '<p>Failed to load books.</p>';
-        }
-    }
-    
-    async function loadStats() {
-        try {
-            // Get active loans count
-            const loansRes = await fetch('/api/transactions?status=borrowed&limit=100');
-            const loansData = await loansRes.json();
-            document.getElementById('stat-active').textContent = loansData.data.total || 0;
-            
-            // Get all history count and Calculate Fines
-            const allRes = await fetch('/api/transactions?limit=100');
-            const allData = await allRes.json();
-            document.getElementById('stat-history').textContent = allData.data.total || 0;
-            
-            let totalFines = 0;
-            
-            // 1. Sum up finalized fines (returned books)
-            if (allData.data.data) {
-                allData.data.data.forEach(trx => {
-                    totalFines += parseFloat(trx.fine_amount || 0);
-                });
-            }
-
-            // 2. Sum up estimated fines (active overdue books)
-            if (loansData.data.data) {
-                const today = new Date();
-                today.setHours(0,0,0,0);
-                
-                loansData.data.data.forEach(trx => {
-                    if (trx.status === 'borrowed' || trx.status === 'overdue') {
-                        const due = new Date(trx.due_date);
-                        due.setHours(0,0,0,0);
-                        
-                        // If Overdue and NOT returned (fine_amount likely 0)
-                        if (today > due && parseFloat(trx.fine_amount || 0) === 0) {
-                            const diffTime = Math.abs(today - due);
-                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                            totalFines += diffDays * 5000;
-                        }
-                    }
-                });
-            }
-            
-            document.getElementById('stat-fines').textContent = 'Rp ' + totalFines.toLocaleString('id-ID');
-        } catch (e) {
-            console.log(e);
-            document.getElementById('stat-fines').textContent = 'Rp -';
         }
     }
 </script>

@@ -2,7 +2,11 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Rebing\GraphQL\GraphQLController;
 use App\Http\Controllers\Api\AuthController;
+
+// GraphQL Route
+Route::any('/graphql', [GraphQLController::class, 'query']);
 
 Route::group([
     'middleware' => 'api',
@@ -19,10 +23,14 @@ Route::get('categories', [\App\Http\Controllers\Api\CategoryController::class, '
 Route::get('books', [\App\Http\Controllers\Api\BookController::class, 'index']);
 Route::get('books/{id}', [\App\Http\Controllers\Api\BookController::class, 'show']);
 
+
+
 Route::group(['middleware' => 'auth:api'], function () {
     Route::post('books/{id}/rate', [\App\Http\Controllers\Api\BookController::class, 'rate']);
     Route::delete('books/{id}/rate', [\App\Http\Controllers\Api\BookController::class, 'unrate']);
 });
+
+
 
 Route::group(['prefix' => 'transactions', 'middleware' => 'auth:api'], function () {
     Route::get('/', [\App\Http\Controllers\Api\TransactionController::class, 'index']);
@@ -30,6 +38,8 @@ Route::group(['prefix' => 'transactions', 'middleware' => 'auth:api'], function 
     Route::post('/borrow', [\App\Http\Controllers\Api\TransactionController::class, 'borrow']);
     Route::post('/{id}/return', [\App\Http\Controllers\Api\TransactionController::class, 'returnBook']);
 });
+
+
 
 Route::group(['prefix' => 'member', 'middleware' => 'auth:api'], function () {
     Route::get('/profile', [\App\Http\Controllers\Api\MemberController::class, 'show']);
