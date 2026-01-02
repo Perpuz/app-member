@@ -1,8 +1,10 @@
 # Dokumentasi Instalasi & Pengembangan Project Perpustakaan
 
-Repository ini berisi sistem perpustakaan digital yang terdiri dari dua aplikasi:
+Repository ini berisi sistem perpustakaan digital dengan arsitektur **Microservices (Separated Frontend & Backend)** untuk bagian Admin.
 
-1.  **`app-librarian`**: Backend API Pustakawan (CodeIgniter 4).
+1.  **`app-librarian`**: Sistem Admin/Pustakawan.
+    *   **Backend**: CodeIgniter 4 (Headless API Only).
+    *   **Frontend**: Static HTML + JS (Client).
 2.  **`app-member`**: Aplikasi Portal Mahasiswa (Laravel 10 + GraphQL Hybrid).
 
 ---
@@ -21,20 +23,13 @@ Buat **dua** database kosong di MySQL:
 
 ---
 
-## 2. Instalasi & Run Aplikasi Librarian (Port: 8081)
-Aplikasi ini berjalan sebagai Backend API.
+## 2. Instalasi & Run Aplikasi Librarian (Admin)
+Aplikasi ini terdiri dari dua bagian yang harus dijalankan terpisah.
 
-1.  **Masuk ke direktori:**
-    ```bash
-    cd app-librarian/backend
-    ```
-2.  **Install Dependencies:**
-    ```bash
-    composer install
-    ```
-3.  **Konfigurasi Environment:**
-    -   Copy file `env` menjadi `.env`
-    -   Edit `.env` (sesuaikan user/password database Anda):
+### A. Jalankan Backend API (Port: 8081)
+1.  Masuk ke folder backend: `cd app-librarian/backend`
+2.  Install dependencies: `composer install`
+3.  Setup `.env` (copy dari `env`):
     ```env
     database.default.hostname = localhost
     database.default.database = perpustakaan_admin
@@ -42,68 +37,59 @@ Aplikasi ini berjalan sebagai Backend API.
     database.default.password = 
     database.default.DBDriver = MySQLi
     ```
-4.  **Migrasi Database:**
-    ```bash
-    php spark migrate
-    ```
-5.  **Jalankan Server (Port 8081):**
+4.  Migrasi Database: `php spark migrate`
+5.  **Jalankan Server:**
     ```bash
     php spark serve --port=8081
     ```
-    > **Penting:** API Admin harus jalan di port **8081** agar bisa diakses oleh aplikasi member.
+    > **Note:** Backend ini tidak menampilkan halaman web (HTML). Jika diakses lewat browser, hanya akan muncul response JSON. Gunakan Frontend di bawah untuk tampilan antarmuka.
 
-    *(Catatan: Folder `frontend` di dalam `app-librarian` saat ini belum digunakan secara aktif dalam alur ini)*
+### B. Jalankan Frontend UI (Port: 5500)
+Agar folder `frontend` berguna sebagai tampilan Admin:
+
+1.  Buka terminal baru.
+2.  Masuk ke folder frontend: `cd app-librarian/frontend`
+3.  Jalankan server statis menggunakan PHP:
+    ```bash
+    php -S localhost:5500
+    ```
+4.  **Akses via Browser:** Buka **http://localhost:5500**
+    *   Frontend ini otomatis terhubung ke Backend di port 8081.
+    *   Gunakan tampilan ini untuk Login Admin dan kelola buku.
 
 ---
 
 ## 3. Instalasi & Run Aplikasi Member (Port: 8000)
-Aplikasi Portal Mahasiswa.
+Aplikasi Portal Mahasiswa (Laravel).
 
-1.  **Masuk ke direktori:**
-    ```bash
-    cd app-member
-    ```
-2.  **Install Dependencies:**
-    ```bash
-    composer install
-    ```
-3.  **Konfigurasi Environment:**
-    -   Copy `.env.example` ke `.env`
-    -   Edit `.env`:
+1.  Masuk ke folder: `cd app-member`
+2.  Install dependencies: `composer install`
+3.  Setup `.env`:
     ```env
     DB_DATABASE=perpustakaan_mahasiswa
-    DB_USERNAME=root
-    DB_PASSWORD=
-
-    # URL API Admin (Arahkan ke Port 8081)
     EXTERNAL_API_URL=http://localhost:8081/api
     ```
-4.  **Generate Key:**
+4.  Generate Key & Migrasi:
     ```bash
     php artisan key:generate
     php artisan jwt:secret
-    ```
-5.  **Migrasi Database:**
-    ```bash
     php artisan migrate --seed
     ```
-6.  **Jalankan Server:**
+5.  **Jalankan Server:**
     ```bash
     php artisan serve
     ```
-    > Default berjalan di **http://localhost:8000**
+    > Akses: **http://localhost:8000**
 
 ---
 
-## 4. Fitur & Penggunaan
+## 4. Ringkasan Arsitektur
+Untuk memenuhi kebutuhan "Backend & Frontend", berikut port yang harus jalan:
 
-### Sinkronisasi Data
-Setelah kedua server berjalan (Admin :8081, Member :8000), jalankan perintah ini di terminal `app-member` untuk mengambil data buku dari Admin:
-```bash
-php artisan books:sync
-```
+| Komponen | Folder | Command | URL Akses |
+| :--- | :--- | :--- | :--- |
+| **Admin Backend** | `app-librarian/backend` | `php spark serve --port=8081` | (API Only) |
+| **Admin Frontend** | `app-librarian/frontend` | `php -S localhost:5500` | **http://localhost:5500** |
+| **Member App** | `app-member` | `php artisan serve` | **http://localhost:8000** |
 
-### Akses GraphQL (Member App)
-Fitur Dashboard, Profil, dan Peminjaman menggunakan GraphQL.
--   **Dashboard**: Login sebagai member, lihat di `http://localhost:8000/dashboard`
--   **Playground**: Coba query manual di `http://localhost:8000/graphiql`
+Semua sistem saling terhubung. Admin Frontend memanggil Admin Backend. Member App memanggil Admin Backend untuk sinkronisasi buku.
